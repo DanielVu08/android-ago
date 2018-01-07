@@ -152,14 +152,31 @@ public class RelativeTimeTextView extends TextView {
 
     private CharSequence getRelativeTimeDisplayString() {
         long now = System.currentTimeMillis();
-        long difference = now - mReferenceTime; 
-        return (difference >= 0 &&  difference<=DateUtils.MINUTE_IN_MILLIS) ? 
-                getResources().getString(R.string.just_now): 
-                DateUtils.getRelativeTimeSpanString(
+        long difference = now - mReferenceTime;
+
+        if (difference >= 0 &&  difference<=DateUtils.MINUTE_IN_MILLIS) {
+            return getResources().getString(R.string.just_now);
+
+        } else if (Math.abs(difference) <= DateUtils.WEEK_IN_MILLIS) {
+            return DateUtils.getRelativeTimeSpanString(
                     mReferenceTime,
                     now,
                     DateUtils.MINUTE_IN_MILLIS,
                     DateUtils.FORMAT_ABBREV_RELATIVE);
+
+        } else if (Math.abs(difference) <= DateUtils.WEEK_IN_MILLIS * 4) {
+            // Return number of days between 7 to 28
+            int days = Math.abs(Math.round(difference / DateUtils.DAY_IN_MILLIS));
+            return difference >=0 ? days + " days ago" : "in " + days + " days";
+
+        } else {
+            return DateUtils.getRelativeTimeSpanString(
+                    mReferenceTime,
+                    now,
+                    DateUtils.MINUTE_IN_MILLIS,
+                    DateUtils.FORMAT_ABBREV_RELATIVE);
+        }
+
     }
 
     @Override
